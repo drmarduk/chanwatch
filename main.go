@@ -19,7 +19,8 @@ func main() {
 	kraut := krautchan{}
 	go watcher(kraut)
 	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/add", addHandler)
+	http.HandleFunc("/watchlist/new", newwatchlistHandler)
+	http.HandleFunc("/watchlist/view/", viewwatchlistHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }

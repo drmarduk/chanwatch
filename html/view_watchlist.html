@@ -1,0 +1,42 @@
+{{define "view_watchlist"}}
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Fastenmonat</title>
+    <meta name="description" content="the ultimate gewichts verlauf">
+    <meta name="author" content="drmarduk">
+
+    <link rel="stylesheet" href="/static/normalize.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.18/css/uikit.min.css" />
+</head>
+
+<body class="uk-container uk-margin-top">
+
+    <code>{{.Base}}</code>
+    <small>({{.Watchlist.Created.Format "02.01.2006 - 15:04"}})</small>
+    <hr>
+
+    <h3 class="uk-h3">Add Thread:</h3>
+    <form method="post" action="/watchlist/add/" class="uk-form">
+        <div class="uk-form-row">
+            <label for="thread" class="uk-form-label">Thread:</label>
+
+            <div class="uk-form-controls">
+                <input type="text" name="thread">
+                <button type="submit" class="uk-button">Add Thread</button>
+            </div>
+        </div>
+    </form>
+
+    <ul class="uk-list">
+        {{ range .Watchlist.Threads }}
+        <li><a href="{{.URL}}">{{.Title}}</a></li>
+        {{ end }}
+    </ul>
+</body>
+
+</html>
+{{end}}
