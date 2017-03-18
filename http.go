@@ -15,13 +15,17 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/*data := struct {
-		URL []string
+	mutex.Lock()
+	t := threads
+	mutex.Unlock()
+
+	data := struct {
+		URL []Thread
 	}{
-		URL: extractURLs(threads),
+		URL: t,
 	}
 
-	tmp.Execute(w, &data) */
+	tmp.Execute(w, &data)
 }
 
 func addHandler(w http.ResponseWriter, r *http.Request) {

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -10,6 +11,7 @@ const (
 	timeout = 30
 )
 
+var mutex sync.Mutex
 var threads []Thread
 
 func main() {
@@ -29,7 +31,12 @@ func watcher(board Imageboard) {
 			log.Printf("error while downloading page: %v\n", err)
 		}
 
-		threads = board.ExtractThreads(src)
+		tmp := board.ExtractThreads(src)
+
+		// lock that shit and release afterwards
+		mutex.Lock()
+		threads = tmp
+		mutex.Unlock()
 
 		log.Printf("Found %d threads.\n", len(threads))
 		for _, t := range threads {
@@ -38,12 +45,4 @@ func watcher(board Imageboard) {
 
 		time.Sleep(timeout * time.Second)
 	}
-}
-
-func extractURLs(threads map[string]string) []string {
-	var result []string
-	for u, _ := range threads {
-		result = append(result, u)
-	}
-	return result
 }
