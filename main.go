@@ -1,76 +1,49 @@
 package main
 
 import (
-	"fmt"
-	"html/template"
-	"io"
 	"log"
 	"net/http"
-	"regexp"
 	"time"
 )
 
-var threads []string
+const (
+	timeout = 30
+)
+
+var threads []Thread
 
 func main() {
 
-	go watcher()
+	kraut := krautchan{}
+	go watcher(kraut)
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/add", addHandler)
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
+
 }
 
-func watcher() {
+func watcher(board Imageboard) {
 	for {
-		src, err := get("http://krautchan.net/catalog/b")
+		src, err := get(board.CatalogURL())
 		if err != nil {
 			log.Printf("error while downloading page: %v\n", err)
 		}
 
-		threads = extractThreads(src)
+		threads = board.ExtractThreads(src)
 
+		log.Printf("Found %d threads.\n", len(threads))
 		for _, t := range threads {
-			log.Println(t)
+			log.Println(t.URL + " - " + t.Title)
 		}
 
-		time.Sleep(30 * time.Second)
+		time.Sleep(timeout * time.Second)
 	}
 }
 
-func extractThreads(src string) []string {
+func extractURLs(threads map[string]string) []string {
 	var result []string
-
-	r := regexp.MustCompile(`class="thread_OP" id="(?P<id>[0-9]*)">\s*<div class="post">\s*<header>\s*<a href="(.*)"><h1>(.*)<`) //(?P<title>(.*))<`)
-
-	names := r.SubexpNames()
-	matches := r.FindAllStringSubmatch(src, -1)
-
-	for _, m := range matches {
-		md := map[string]string{}
-		for i, n := range m {
-			md[names[i]] = n
-		}
-
-		result = append(result, fmt.Sprintf("http://krautchan.net/b/thread-%s.html - %s", md["id"], md["title"]))
+	for u, _ := range threads {
+		result = append(result, u)
 	}
 	return result
-}
-
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	tmp := template.New("index")
-	tmp, err := tmp.ParseFiles("./html/index.html")
-	if err != nil {
-		log.Printf("error while parsing template. %v\n", err)
-		return
-	}
-
-	data := struct {
-		URL []string
-	}{
-		URL: threads,
-	}
-	tmp.Execute(w, &data)
-}
-func addHandler(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "add")
 }
