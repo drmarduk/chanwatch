@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html"
 	"regexp"
 )
 
@@ -34,7 +35,7 @@ func (k krautchan) ExtractThreads(src string) (result []Thread) {
 
 		t := Thread{}
 		t.URL = fmt.Sprintf("%s/b/thread-%s.html", k.BaseURL(), md["id"])
-		t.Title = md["title"]
+		t.Title = html.UnescapeString(md["title"])
 
 		result = append(result, t)
 	}

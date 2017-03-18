@@ -16,7 +16,7 @@
 <body class="uk-container uk-margin-top">
     <ul class="uk-list">
         {{ range .URL }}
-        <li><a href="{{.}}">Link</a></li>
+        <li><a href="{{.URL}}">{{.Title}}</a></li>
         {{ end }}
     </ul>
 </body>
