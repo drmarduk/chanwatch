@@ -1,0 +1,5 @@
+*.*
+!*.go
+!*.html
+!*.css
+!.gitignore
