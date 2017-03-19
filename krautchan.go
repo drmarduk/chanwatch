@@ -13,12 +13,12 @@ type krautchan struct {
 
 // BaseURL returns the base url of the imageboard
 func (k krautchan) BaseURL() string {
-	return "http://krautchan.net/"
+	return "http://krautchan.net"
 }
 
 // CatalogURL returns a convenvient way to list all threads
 func (k krautchan) CatalogURL() string {
-	return "http://krautchan.net/catalog/b/"
+	return "http://krautchan.net/catalog/b"
 }
 
 func (k krautchan) ExtractThreads(src string) (result []Thread) {
