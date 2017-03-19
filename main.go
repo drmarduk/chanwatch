@@ -18,6 +18,8 @@ func main() {
 
 	kraut := krautchan{}
 	go watcher(kraut)
+
+	watchContainer = NewWatchContainer()
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/watchlist/new", newwatchlistHandler)
 	http.HandleFunc("/watchlist/view/", viewwatchlistHandler)

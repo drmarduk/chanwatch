@@ -30,17 +30,12 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO: make this an own type
-var watchContainer map[string]WatchList
+var watchContainer WatchContainer
 
 func newwatchlistHandler(w http.ResponseWriter, r *http.Request) {
-	if watchContainer == nil {
-		watchContainer = make(map[string]WatchList)
-	}
-	// creates a new watchlist and redirects to this
-	wl := NewWatchList()
-	watchContainer[wl.ID] = wl
+	id := watchContainer.NewList()
 
-	url := fmt.Sprintf("/watchlist/view/%s", wl.ID)
+	url := fmt.Sprintf("/watchlist/view/%s", id)
 	http.Redirect(w, r, url, 302)
 }
 
@@ -48,10 +43,17 @@ func viewwatchlistHandler(w http.ResponseWriter, r *http.Request) {
 	req := r.URL.Path
 	req = strings.Replace(req, "/watchlist/view/", "", -1)
 
-	wl := watchContainer[req]
+	wl, err := watchContainer.GetWatchList(req)
+	if err != nil {
+		// no list found
+		log.Printf("WatchList %s not found!", req)
+		http.Redirect(w, r, "/", 302)
+	}
+
+	log.Printf("Open WatchList %s\n", wl.ID)
 
 	tmp := template.New("view_watchlist")
-	tmp, err := tmp.ParseFiles("./html/view_watchlist.html")
+	tmp, err = tmp.ParseFiles("./html/view_watchlist.html")
 	if err != nil {
 		log.Printf("error while parsing template. %v\n", err)
 		return
@@ -70,8 +72,12 @@ func viewwatchlistHandler(w http.ResponseWriter, r *http.Request) {
 
 func addwatchlistHandler(w http.ResponseWriter, r *http.Request) {
 	req := r.URL.Path
-	req := strings.Replace(req, "/watchlist/add/", "", -1)
+	req = strings.Replace(req, "/watchlist/add/", "", -1)
 
-	wl := watchContainer[req]
-	wl.
+	thread := r.Form.Get("thread")
+	// TODO: sanitize url
+	watchContainer.AddThread(req, thread)
+	// TODO: do proper redirection
+	url := fmt.Sprintf("/watchlist/view/%s", req)
+	http.Redirect(w, r, url, 302)
 }

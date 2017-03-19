@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"math/rand"
 	"time"
 )
@@ -19,16 +20,20 @@ func NewWatchList() WatchList {
 }
 
 // AddThread appends a new Thread to the list
-func (wl *WatchList) AddThread(url string) {
+func (wl *WatchList) AddThread(url string) error {
+	if url == "" {
+		return errors.New("url is empty")
+	}
 	t := Thread{URL: url}
 
 	// kA ob das alles überlebt
 	go completeThreadInfo(t)
 	wl.Threads = append(wl.Threads, t)
+	return nil
 }
 
 func completeThreadInfo(t Thread) {
-	panic("complete shit")
+	// panic("complete shit")
 }
 
 func generateID(strlen int) string {
