@@ -4,12 +4,12 @@ import "errors"
 
 // WatchContainer organizes all threadlistsj
 type WatchContainer struct {
-	Lists map[string]WatchList
+	Lists map[string]*WatchList
 }
 
 // NewWatchContainer returns a new instance of the container
 func NewWatchContainer() WatchContainer {
-	return WatchContainer{Lists: make(map[string]WatchList)}
+	return WatchContainer{Lists: make(map[string]*WatchList)}
 }
 
 // NewList creates a new watchlist and adds it to the container
@@ -30,12 +30,12 @@ func (wc *WatchContainer) AddThread(id, url string) error {
 }
 
 // GetWatchList returns a List based on the id
-func (wc *WatchContainer) GetWatchList(id string) (WatchList, error) {
+func (wc *WatchContainer) GetWatchList(id string) (*WatchList, error) {
 	return getList(id, wc.Lists)
 }
 
-func getList(id string, lists map[string]WatchList) (WatchList, error) {
-	var wl WatchList
+func getList(id string, lists map[string]*WatchList) (*WatchList, error) {
+	var wl *WatchList
 	var ok bool
 
 	if wl, ok = lists[id]; !ok {

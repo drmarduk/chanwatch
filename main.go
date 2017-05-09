@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"sync"
 	"time"
 )
@@ -15,14 +17,23 @@ var mutex sync.Mutex
 var threads []Thread
 
 func main() {
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		os.Exit(0)
+	}()
 
-	kraut := krautchan{}
-	go watcher(kraut)
+	//kraut := krautchan{}
+	//go watcher(kraut)
 
 	watchContainer = NewWatchContainer()
+
+	// start webserver
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/watchlist/new", newwatchlistHandler)
 	http.HandleFunc("/watchlist/view/", viewwatchlistHandler)
+	http.HandleFunc("/watchlist/add", addwatchlistHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }

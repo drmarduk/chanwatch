@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"regexp"
+	"strings"
 )
 
 // TODO: might push to own package
@@ -38,6 +39,33 @@ func (k krautchan) ExtractThreads(src string) (result []Thread) {
 		t.Title = html.UnescapeString(md["title"])
 
 		result = append(result, t)
+	}
+	return result
+}
+
+func krautchanExtractTitle(src string) string {
+	r := regexp.MustCompile(`<span class="postsubject">(.*)</span>`)
+	match := r.FindString(src)
+	match = match[26:]
+	match = strings.Replace(match, "</span>", "", 1)
+	if match == "" {
+		return "no title found"
+	}
+	return match
+}
+
+func krautchanExtractImages(src string) []string {
+	r := regexp.MustCompile(`<a href="/files/(.*).(jpg|jpeg|gif|png|webm)" target="_blank">`)
+	matches := r.FindAllString(src, -1)
+
+	var result []string
+
+	for _, m := range matches {
+		m = m[9:]
+		m = strings.Replace(m, `" target="_blank">`, "", 1)
+		m = "http://krautchan.net" + m
+
+		result = append(result, m)
 	}
 	return result
 }

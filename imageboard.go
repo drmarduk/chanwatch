@@ -9,7 +9,9 @@ type Imageboard interface {
 
 // Thread holds the basic metadata of a thread
 type Thread struct {
-	URL   string
-	Title string
-	Src   string // is optional
+	URL        string
+	Title      string
+	Src        string // is optional
+	Images     []string
+	ImageCount int
 }
