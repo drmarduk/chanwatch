@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+// indexHandler collects all threads available from
+// all chans and presents them on the index page
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tmp := template.New("index")
 	tmp, err := tmp.ParseFiles("./html/index.html")
@@ -43,14 +45,17 @@ func viewwatchlistHandler(w http.ResponseWriter, r *http.Request) {
 	req := r.URL.Path
 	req = strings.Replace(req, "/watchlist/view/", "", -1)
 
+	log.Printf("/viewwatchlist/view/%s .\n", req)
+
 	wl, err := watchContainer.GetWatchList(req)
 	if err != nil {
 		// no list found
 		log.Printf("WatchList %s not found!", req)
 		http.Redirect(w, r, "/", 302)
+		return
 	}
 
-	log.Printf("Open WatchList %s\n", wl.ID)
+	log.Printf("Found Watchlist: %s.\n", wl.String())
 
 	tmp := template.New("view_watchlist")
 	tmp, err = tmp.ParseFiles("./html/view_watchlist.html")
@@ -61,7 +66,7 @@ func viewwatchlistHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Base      string
-		Watchlist WatchList
+		Watchlist *WatchList
 	}{
 		Base:      fmt.Sprintf("http://localhost:8080/watchlist/view/%s", wl.ID),
 		Watchlist: wl,
@@ -71,13 +76,12 @@ func viewwatchlistHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func addwatchlistHandler(w http.ResponseWriter, r *http.Request) {
-	req := r.URL.Path
-	req = strings.Replace(req, "/watchlist/add/", "", -1)
-
-	thread := r.Form.Get("thread")
-	// TODO: sanitize url
-	watchContainer.AddThread(req, thread)
+	id := r.FormValue("id")
+	thread := r.FormValue("thread")
+	log.Printf("/watchlist/add: ID: %s - Thread: %s\n", id, thread)
+	// TODO: sanitize threadurl and id
+	watchContainer.AddThread(id, thread)
 	// TODO: do proper redirection
-	url := fmt.Sprintf("/watchlist/view/%s", req)
+	url := fmt.Sprintf("/watchlist/view/%s", id)
 	http.Redirect(w, r, url, 302)
 }

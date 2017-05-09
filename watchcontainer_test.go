@@ -60,5 +60,4 @@ func TestWatchContainerGet(t *testing.T) {
 	if wl.ID != id {
 		t.Fatalf("WatchList ID mismatching")
 	}
-
 }
